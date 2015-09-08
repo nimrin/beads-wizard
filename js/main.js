@@ -24,7 +24,8 @@ var wizard = {
     beadsMaxIndex: 0,
     schemaStartX: CONST.SCALE_WIDTH + 0.5,
     prevState: {nextIndex: 0},
-    totalBeadsNumber: 0
+    totalBeadsNumber: 0,
+    colorsCount: {}
 };
 
 $(function () {
@@ -181,6 +182,28 @@ $(function () {
         }
     };
 });
+function countColor(oldColor, newColor) {
+    if (wizard.colorsCount[oldColor]) {
+        wizard.colorsCount[oldColor]--;
+        if (wizard.colorsCount[oldColor] == 0) {
+            delete wizard.colorsCount[oldColor];
+        }
+    }
+    if (wizard.colorsCount[newColor]) {
+        wizard.colorsCount[newColor]++
+    } else {
+        wizard.colorsCount[newColor] = 1;
+    }
+    var str = '';
+
+    for (var color in wizard.colorsCount) {
+        if (wizard.colorsCount.hasOwnProperty(color)) {
+            str += '<tr class="color-container"><td><div class="color-sample" style="background-color: '
+                + color + '"></div></td><td class="color-count"> ' + wizard.colorsCount[color] + '</td></tr>'
+        }
+    }
+    $('#color-samples').html(str);
+}
 function addLine(addition) {
     var lineY = 0.5 + wizard.beads.nextIndex * CONST.BEAD_HEIGHT;
     wizard.beads[wizard.beads.nextIndex] = [];
@@ -295,6 +318,7 @@ function initGradColor(grd, style, color) {
 }
 function fillBead(bead, newColor) {
     if (bead != null) {
+        countColor(bead.color, newColor);
         bead.color = newColor;
 
         var startX = bead.x + 0.5;
@@ -371,12 +395,14 @@ function init(fromFile) {
 
     wizard.beadsNumber = $("#beads-number").val();
     wizard.linesNumber = $("#lines-number").val();
+
     wizard.totalBeadsNumber = wizard.beadsNumber * wizard.linesNumber;
+
     if (/^\d+$/.test(wizard.beadsNumber.toString()) && /^\d+$/.test(wizard.linesNumber.toString())) {
         wizard.linesMaxIndex = wizard.linesNumber - 1;
         wizard.beadsMaxIndex = wizard.beadsNumber - 1;
 
-        wizard.canvasObj.width = wizard.schemaStartX + (wizard.beadsNumber + 1) * CONST.BEAD_WIDTH + 1;
+        wizard.canvasObj.width = wizard.schemaStartX + wizard.beadsNumber * CONST.BEAD_WIDTH + CONST.BEAD_WIDTH;
         wizard.canvasObj.height = getCanvasHeight();
 
         drawScale();
@@ -471,6 +497,56 @@ function loadFile() {
         }
     };
     fileReader.readAsText(fileToLoad);
+}
+
+function schemaToLine() {
+    if (wizard.beads.nextIndex > 0) {
+        var lineBeads = [];
+
+        var current = {number:1, color:wizard.beads[0][0].color, fillStyle:wizard.beads[0][0].fillStyle};
+        for (var i = 0; i < wizard.beads.nextIndex; i++) {
+            for (var j = 0; j < wizard.beads[i].length; j++) {
+                var nextInd = nextIndex(i,j);
+                if (nextInd != null) {
+                    var nextBead = wizard.beads[nextInd.lineIndex][nextInd.beadIndex];
+                    if (isSameColor(nextBead, current.color, current.fillStyle)) {
+                        current.number++;
+                    } else {
+                        var newCount = {number:current.number, color:current.color, fillStyle:current.fillStyle};
+                        lineBeads.push(newCount);
+                        current = {number:1, color:nextBead.color, fillStyle:nextBead.fillStyle};
+                    }
+                } else {
+                    lineBeads.push(current);
+                }
+            }
+        }
+        console.log(lineBeads);
+    }
+}
+
+function nextIndex(lineIndex, beadIndex) {
+    var maxBeadIndex = wizard.beadsMaxIndex;
+    if (lineIndex % 2 != 0) {
+        maxBeadIndex--;
+    }
+    if (lineIndex == wizard.linesMaxIndex && beadIndex == maxBeadIndex)
+        return null;
+    var index = {};
+
+    if (beadIndex < maxBeadIndex) {
+        index.lineIndex = lineIndex;
+        index.beadIndex = beadIndex + 1;
+    } else {
+        index.lineIndex = lineIndex + 1;
+        index.beadIndex = 0;
+    }
+
+    return index;
+}
+
+function isSameColor(bead, color, style) {
+    return bead.color == color && bead.fillStyle == style;
 }
 
 

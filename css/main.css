@@ -154,7 +154,6 @@ button:active, button.selected {
 button:disabled {
     background: #2d6275;
 }
-
 .fillStyle {
     text-align: left;
     left: 209px;
@@ -162,6 +161,13 @@ button:disabled {
     top: 90px;
     z-index: 900;
 }
-
-
-
+.color-sample {
+    width: 10px;
+    height: 10px;
+    border: 1px solid #000;
+    margin: 2px;
+}
+.color-container {
+    display: table;
+    margin-top: 10px;
+}
