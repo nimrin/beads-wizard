@@ -14,8 +14,6 @@ var wizard = {
     canvasObj: null,
     jcanvas: null,
     contextObj: null,
-    lineCanvasObj: null,
-    lineContextObj: null,
     fillByColorBtn: null,
     color: null,
     mode: CONST.modes.drawing,
@@ -25,7 +23,6 @@ var wizard = {
     linesMaxIndex: 0,
     beadsMaxIndex: 0,
     schemaStartX: CONST.SCALE_WIDTH + 0.5,
-    linesStartX: 0,
     prevState: {nextIndex: 0},
     totalBeadsNumber: 0
 };
@@ -36,9 +33,6 @@ $(function () {
     wizard.jcanvas = $("#canvas");
     wizard.canvasObj = document.getElementById("canvas");
     wizard.contextObj = wizard.canvasObj.getContext('2d');
-
-    wizard.lineCanvasObj = document.getElementById("canvas-line");
-    wizard.lineContextObj = wizard.canvasObj.getContext('2d');
 
     wizard.fillByColorBtn = $("#fill-by-color");
 
@@ -53,7 +47,6 @@ $(function () {
     $("#apply").click(function() {
         savePrevState();
         init(false);
-        schemaToLine();
     });
 
     $("#clear").click(function() {
@@ -61,7 +54,6 @@ $(function () {
         $("#color").ColorPickerSetColor(CONST.WHITE);
         setCurrentColor(CONST.WHITE);
         init(false);
-        schemaToLine();
     });
 
     $("#pipet").click(function() {
@@ -79,7 +71,7 @@ $(function () {
     $("#color").ColorPicker({
         color: wizard.color,
         flat: true,
-        onSubmit: function(hsb, hex, rgb) {
+        onSubmit: function(hsb, hex) {
             setCurrentColor("#" + hex);
         },
         onBeforeShow: function () {
@@ -107,14 +99,17 @@ $(function () {
     });
 
     $("#add-line").click(function() {
-        addLine();
+        addLine(true);
+    });
+
+    $("#remove-line").click(function() {
+        removeLine();
     });
 
     wizard.jcanvas.click(function(e) {
         var bead;
         if (wizard.mode == CONST.modes.drawing) {
             fillBeadAtEvent(e);
-            schemaToLine();
         } else if (wizard.mode == CONST.modes.pipet) {
             setDefaultMode();
             bead = defineBeadUnderCursor(e);
@@ -129,7 +124,6 @@ $(function () {
             bead = defineBeadUnderCursor(e);
             if (bead != null) {
                 fillBeadsByColor(bead.color, bead.fillStyle);
-                schemaToLine();
             }
     }}).mousedown(function () {
         if (wizard.mode == CONST.modes.drawing) {
@@ -138,7 +132,6 @@ $(function () {
             $(window).mousemove(function (e) {
                 if (isDragging) {
                    fillBeadAtEvent(e);
-                   schemaToLine();
                 }
             });
         }
@@ -159,7 +152,6 @@ $(function () {
     $("#fill-all").click(function() {
         savePrevState();
         fillAllBeads();
-        schemaToLine();
     });
 
     wizard.fillByColorBtn.click(function() {
@@ -188,7 +180,7 @@ $(function () {
         }
     };
 });
-function addLine() {
+function addLine(addition) {
     var lineY = 0.5 + wizard.beads.nextIndex * CONST.BEAD_HEIGHT;
     wizard.beads[wizard.beads.nextIndex] = [];
 
@@ -206,9 +198,14 @@ function addLine() {
     }
     wizard.beads.nextIndex++;
 
-    wizard.linesNumber++;
-    $("#lines-number").val(wizard.linesNumber);
-    init(true);
+    if (addition) {
+        wizard.linesNumber++;
+        $("#lines-number").val(wizard.linesNumber);
+        init(true);
+    }
+}
+function removeLine() {
+
 }
 function savePrevState() {
     $("#revert").removeAttr("disabled");
@@ -370,13 +367,8 @@ function init(fromFile) {
         wizard.linesMaxIndex = wizard.linesNumber - 1;
         wizard.beadsMaxIndex = wizard.beadsNumber - 1;
 
-        wizard.linesStartX = wizard.schemaStartX + wizard.beadsNumber * CONST.BEAD_WIDTH + wizard.offsetX + CONST.LINE_SPACE;
-
-        wizard.canvasObj.width = wizard.schemaStartX + wizard.beadsNumber * CONST.BEAD_WIDTH + 1;
+        wizard.canvasObj.width = wizard.schemaStartX + (wizard.beadsNumber + 1) * CONST.BEAD_WIDTH + 1;
         wizard.canvasObj.height = getCanvasHeight();
-
-        wizard.lineCanvasObj.width = $(wizard.lineCanvasObj).parent().width();
-        wizard.lineCanvasObj.height = getCanvasHeight();
 
         drawScale();
 
@@ -384,7 +376,6 @@ function init(fromFile) {
             initBeadsMatrix();
         }
         drawSchema(fromFile);
-        schemaToLine();
     }
     progressLoader.hide();
 }
@@ -404,23 +395,7 @@ function initBeadsMatrix() {
     wizard.beads = {nextIndex: 0};
 
     for (var i = 0; i < wizard.linesNumber; i++) {
-        var lineY = 0.5 + i * CONST.BEAD_HEIGHT;
-        wizard.beads[i] = [];
-
-        var offset = 0;
-        var beadsInLine = wizard.beadsNumber;
-        if (i % 2 != 0) {
-            offset = wizard.offsetX;
-
-        }
-        for (var j = 0; j < beadsInLine; j ++ ) {
-            wizard.beads[i][j] = {
-                x : wizard.schemaStartX + offset + j * CONST.BEAD_WIDTH,
-                y : lineY,
-                color: CONST.WHITE
-            }
-        }
-        wizard.beads.nextIndex++;
+        addLine(false);
     }
 }
 function drawSchema(withColor) {
@@ -438,95 +413,6 @@ function drawSchema(withColor) {
         wizard.contextObj.strokeStyle = "#181818";
         wizard.contextObj.stroke();
     }
-}
-function isSameColor(bead, color, style) {
-    return bead.color == color && bead.fillStyle == style;
-}
-
-function nextIndex(lineIndex, beadIndex) {
-    var maxBeadIndex = wizard.beadsMaxIndex;
-    if (lineIndex % 2 != 0) {
-        maxBeadIndex--;
-    }
-    if (lineIndex == wizard.linesMaxIndex && beadIndex == maxBeadIndex)
-        return null;
-    var index = {};
-
-    if (beadIndex < maxBeadIndex) {
-        index.lineIndex = lineIndex;
-        index.beadIndex = beadIndex + 1;
-    } else {
-        index.lineIndex = lineIndex + 1;
-        index.beadIndex = 0;
-    }
-
-    return index;
-}
-
-//строится сверху вниз, отрисовывается по принципу "начинаем снизу"
-function schemaToLine() {
-    if (wizard.beads.nextIndex > 0) {
-        var lineBeads = [];
-
-        var current = {number:1, color:wizard.beads[0][0].color, fillStyle:wizard.beads[0][0].fillStyle};
-        for (var i = 0; i < wizard.beads.nextIndex; i++) {
-            for (var j = 0; j < wizard.beads[i].length; j++) {
-                var nextInd = nextIndex(i,j);
-                if (nextInd != null) {
-                    var nextBead = wizard.beads[nextInd.lineIndex][nextInd.beadIndex];
-                    if (isSameColor(nextBead, current.color, current.fillStyle)) {
-                        current.number++;
-                    } else {
-                        var newCount = {number:current.number, color:current.color, fillStyle:current.fillStyle};
-                        lineBeads.push(newCount);
-                        current = {number:1, color:nextBead.color, fillStyle:nextBead.fillStyle};
-                    }
-                } else {
-                    lineBeads.push(current);
-                }
-            }
-        }
-    }
-
-    var lineX = wizard.linesStartX;
-    var lineElemHeight = CONST.BEAD_HEIGHT + 2;
-    var gradWidth = lineX + CONST.BEAD_WIDTH;
-    var numberX = 0.5 + lineX + CONST.BEAD_WIDTH + 5;
-
-    wizard.contextObj.fillStyle = CONST.WHITE;
-    wizard.contextObj.fillRect(lineX - 1, 0, wizard.canvasObj.width - (wizard.offsetX + wizard.beadsNumber * 3), wizard.canvasObj.height);
-
-    var totalHeight = getCanvasHeight();
-
-    var forCountY = 0;
-    for (var c = lineBeads.length - 1; c >= 0; c--) {
-        var y = 0.5 + forCountY * lineElemHeight;
-        forCountY++;
-
-        if (y >= totalHeight) {
-            forCountY = 0;
-            y = 0.5 + forCountY * lineElemHeight;
-            lineX = lineX +  CONST.BEAD_WIDTH + CONST.LINE_SPACE;
-            numberX = lineX + CONST.BEAD_WIDTH + 5 + 0.5;
-            gradWidth = lineX + CONST.BEAD_WIDTH;
-            forCountY++;
-        }
-
-        wizard.contextObj.strokeRect(lineX, y, CONST.BEAD_WIDTH, CONST.BEAD_HEIGHT);
-
-        var gradY = y + CONST.BEAD_HEIGHT / 2;
-        var grd = wizard.contextObj.createLinearGradient(lineX, gradY, gradWidth, gradY);
-        initGradColor(grd, lineBeads[c].fillStyle, lineBeads[c].color);
-
-        wizard.contextObj.fillStyle = grd;
-        wizard.contextObj.fillRect(lineX, y, CONST.BEAD_WIDTH, CONST.BEAD_HEIGHT);
-
-        wizard.contextObj.textBaseline = "top";
-        wizard.contextObj.font = "8pt Arial";
-        wizard.contextObj.fillStyle = "#000000";
-        wizard.contextObj.fillText(lineBeads[c].number.toString(), numberX, y);
-    }
-    wizard.contextObj.stroke();
 }
 
 function saveAsFile()
