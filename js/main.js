@@ -1,12 +1,12 @@
 var CONST = {
     BEAD_HEIGHT: 14,
     BEAD_WIDTH: 14,
-    modes: {drawing: "default", pipet: "pipet", filling: "filling"},
+    MODES: {drawing: "default", pipet: "pipet", filling: "filling"},
     WHITE: "#ffffff",
     LIGHTER_INDEX: 0.8,
     LINE_SPACE: 25,
     SCALE_WIDTH: 30,
-    colors: ['violet', 'siren', 'mint']
+    COLORS: ['violet', 'siren', 'mint']
 };
 
 var wizard = {
@@ -17,7 +17,7 @@ var wizard = {
     contextObj: null,
     fillByColorBtn: null,
     color: null,
-    mode: CONST.modes.drawing,
+    mode: CONST.MODES.drawing,
     offsetX: CONST.BEAD_WIDTH / 2,
     beads: {nextIndex: 0},
     linesY: [],
@@ -30,8 +30,8 @@ var wizard = {
 };
 function generateColorSelect() {
     var select = '<select><option value="">select color name</option>';
-    for (var i = 0; i < CONST.colors.length; i++) {
-        select += '<option value="' + CONST.colors[i] + '">' + CONST.colors[i] + '</option>'
+    for (var i = 0; i < CONST.COLORS.length; i++) {
+        select += '<option value="' + CONST.COLORS[i] + '">' + CONST.COLORS[i] + '</option>'
     }
     select += '</select>';
     return select;
@@ -117,9 +117,9 @@ $(function () {
 
     wizard.jcanvas.click(function (e) {
         var bead;
-        if (wizard.mode == CONST.modes.drawing) {
+        if (wizard.mode == CONST.MODES.drawing) {
             fillBeadAtEvent(e);
-        } else if (wizard.mode == CONST.modes.pipet) {
+        } else if (wizard.mode == CONST.MODES.pipet) {
             setDefaultMode();
             bead = defineBeadUnderCursor(e);
             if (bead != null) {
@@ -127,7 +127,7 @@ $(function () {
                 $("#color").ColorPickerSetColor(pipetColor);
                 setCurrentColor(pipetColor);
             }
-        } else if (wizard.mode == CONST.modes.filling) {
+        } else if (wizard.mode == CONST.MODES.filling) {
             savePrevState();
             setDefaultMode();
             bead = defineBeadUnderCursor(e);
@@ -136,7 +136,7 @@ $(function () {
             }
         }
     }).mousedown(function () {
-        if (wizard.mode == CONST.modes.drawing) {
+        if (wizard.mode == CONST.MODES.drawing) {
             savePrevState();
             isDragging = true;
             $(window).mousemove(function (e) {
@@ -197,10 +197,12 @@ function countColor(oldColor, newColor) {
             delete wizard.colorsCount[oldColor];
         }
     }
-    if (wizard.colorsCount[newColor]) {
-        wizard.colorsCount[newColor]++
-    } else {
-        wizard.colorsCount[newColor] = 1;
+    if (newColor) {
+        if (wizard.colorsCount[newColor]) {
+            wizard.colorsCount[newColor]++
+        } else {
+            wizard.colorsCount[newColor] = 1;
+        }
     }
     var str = '';
 
@@ -239,6 +241,10 @@ function addLine(addition) {
 }
 function removeLine() {
     if (wizard.beads.nextIndex > 0) {
+        var line = wizard.beads[wizard.beads.nextIndex - 1];
+        for (var i = 0; i < line.length; i++) {
+            countColor(line[i].color);
+        }
         delete wizard.beads[wizard.beads.nextIndex - 1];
     }
     wizard.beads.nextIndex--;
@@ -350,18 +356,18 @@ function fillBead(bead, newColor) {
 }
 function setDefaultMode() {
     $("button").removeClass("selected");
-    wizard.mode = CONST.modes.drawing;
+    wizard.mode = CONST.MODES.drawing;
     wizard.jcanvas.css("cursor", "auto !important");
 }
 
 function setPipetMode() {
     $("#pipet").addClass("selected");
-    wizard.mode = CONST.modes.pipet;
+    wizard.mode = CONST.MODES.pipet;
     wizard.jcanvas.css("cursor", "crosshair");
 }
 function setFillingMode() {
     wizard.fillByColorBtn.addClass("selected");
-    wizard.mode = CONST.modes.filling;
+    wizard.mode = CONST.MODES.filling;
     wizard.jcanvas.css("cursor", "crosshair");
 }
 
