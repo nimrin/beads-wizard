@@ -191,7 +191,7 @@ $(function () {
     };
 
 function countColor(oldColor, newColor) {
-    if (wizard.colorsCount[oldColor]) {
+    if (oldColor && wizard.colorsCount[oldColor]) {
         wizard.colorsCount[oldColor]--;
         if (wizard.colorsCount[oldColor] == 0) {
             delete wizard.colorsCount[oldColor];
@@ -227,8 +227,7 @@ function addLine(addition) {
     for (var j = 0; j < beadsInLine; j++) {
         wizard.beads[wizard.beads.nextIndex][j] = {
             x: wizard.schemaStartX + offset + j * CONST.BEAD_WIDTH,
-            y: lineY,
-            color: CONST.WHITE
+            y: lineY
         }
     }
     wizard.beads.nextIndex++;
@@ -454,7 +453,7 @@ function drawSchema(withColor) {
         for (var i = 0; i < wizard.beads.nextIndex; i++) {
             for (var j = 0; j < wizard.beads[i].length; j++) {
                 wizard.contextObj.rect(wizard.beads[i][j].x, wizard.beads[i][j].y, CONST.BEAD_WIDTH, CONST.BEAD_HEIGHT);
-                if (withColor) {
+                if (withColor && wizard.beads[i][j].color) {
                     fillBead(wizard.beads[i][j], wizard.beads[i][j].color)
                 } else {
                     fillBead(wizard.beads[i][j], CONST.WHITE)
