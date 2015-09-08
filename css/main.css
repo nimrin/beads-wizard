@@ -1,0 +1,167 @@
+body, h1 {
+    margin: 0;
+}
+html, body{
+    height: 100%;
+}
+h1 {
+   padding: 10px;
+}
+.canvas-container {
+    margin-top: 10px;
+    border: 1px solid #ececec;
+    padding: 10px;
+    position: relative;
+    background: #ffffff;
+    text-align: left;
+}
+.error {
+    color:red;
+    padding: 10px;
+    border: 1px solid red;
+}
+.input-block {
+    line-height: 30px;
+    display: table;
+    position: relative;
+}
+.input-block40 {
+    line-height: 40px;
+    display: table;
+    position: relative;
+}
+input.number {
+    width: 30px;
+}
+.group-block {
+    float: left;
+    background: #ffffff;
+}
+.x-clear {
+    clear: both;
+}
+#wrapper {
+    text-align: center;
+    height: auto;
+    margin: 0 auto;
+    padding: 20px;
+    display: table;
+}
+#progress-loader{
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 11;
+    display: none;
+}
+.error {
+    border: 1px solid salmon;
+    color: salmon;
+    display: none;
+}
+.copyright {
+    padding-top: 10px;
+}
+.options {
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+.options-block {
+    display: table;
+    padding: 5px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+.buttons-block {
+    text-align: left;
+    padding-bottom: 10px;
+}
+.blue {
+    background: #5DA6C0;
+    border: 1px solid #3F87A2;
+}
+.btn-icon {
+    padding: 0;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    width: 34px;
+    height: 34px;
+}
+.dark-blue {
+    background: #2d6275;
+    border: 1px solid #3F87A2;
+}
+#file-to-load {
+    display: none;
+}
+input[type="text"] {
+    border: 1px solid #3F87A2;
+    line-height: 20px;
+    padding: 0 4px;
+}
+input[type="radio"] {
+    margin: 0;
+}
+.center {
+    text-align: center;
+}
+button {
+    line-height: 20px;
+    padding: 4px 6px;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #519cb8), color-stop(1, #2d6275));
+    background:-moz-linear-gradient(top, #519cb8 5%, #2d6275 100%);
+    background:-webkit-linear-gradient(top, #519cb8 5%, #2d6275 100%);
+    background:-o-linear-gradient(top, #519cb8 5%, #2d6275 100%);
+    background:-ms-linear-gradient(top, #519cb8 5%, #2d6275 100%);
+    background:linear-gradient(to bottom, #519cb8 5%, #2d6275 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#519cb8', endColorstr='#2d6275',GradientType=0);
+    background-color:#519cb8;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    border-radius:3px;
+    border:1px solid #124d77;
+    display:inline-block;
+    color:#ffffff;
+    font-size:12px;
+    font-weight:normal;
+    text-decoration:none;
+    text-shadow:0 1px 0 #154682;
+}
+button:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #2d6275), color-stop(1, #519cb8));
+    background:-moz-linear-gradient(top, #2d6275 5%, #519cb8 100%);
+    background:-webkit-linear-gradient(top, #2d6275 5%, #519cb8 100%);
+    background:-o-linear-gradient(top, #2d6275 5%, #519cb8 100%);
+    background:-ms-linear-gradient(top, #2d6275 5%, #519cb8 100%);
+    background:linear-gradient(to bottom, #2d6275 5%, #519cb8 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#2d6275', endColorstr='#519cb8',GradientType=0);
+    background-color:#2d6275;
+}
+button:active, button.selected {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.6, #2d6275), color-stop(1, #519cb8));
+    background:-moz-linear-gradient(top, #2d6275 60%, #519cb8 100%);
+    background:-webkit-linear-gradient(top, #2d6275 60%, #519cb8 100%);
+    background:-o-linear-gradient(top, #2d6275 60%, #519cb8 100%);
+    background:-ms-linear-gradient(top, #2d6275 60%, #519cb8 100%);
+    background:linear-gradient(to bottom, #2d6275 60%, #519cb8 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#2d6275', endColorstr='#519cb8',GradientType=0);
+    background-color:#2d6275;
+}
+button:disabled {
+    background: #2d6275;
+}
+
+.fillStyle {
+    text-align: left;
+    left: 209px;
+    position: absolute;
+    top: 90px;
+    z-index: 900;
+}
+
+
+

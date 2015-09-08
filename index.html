@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link type="text/css" href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" media="screen" type="text/css" href="css/colorpicker.css"/>
+    <link type="text/css" href="css/main.css" rel="stylesheet"/>
+
+    <script src="js/jquery/jquery.min.js"></script>
+
+    <script type="text/javascript" src="js/colorpicker.js"></script>
+    <script src="js/main.js"></script>
+</head>
+<body>
+<div id="wrapper">
+    <div class="row">
+        <div class="col-lg-3 col-sm-12">
+            <div class="options-block blue">
+                <div class="input-params">
+                    <div class="input-block">
+                        <span>Rows</span>
+                        <input class="number" type="text" id="lines-number" value="25"/>
+                    </div>
+
+                    <div class="input-block">
+                        <span>Beads in row</span>
+                        <input class="number" type="text" id="beads-number" value="18"/>
+                        <button onclick="return false;" id="apply" title="Scheme will be cleared">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 col-sm-12">
+            <div class="buttons-block center">
+                <button class="btn-icon" onclick="return false" id="load-file" title="Open"><img
+                        src="images/open-file.png"></button>
+                <input type="file" id="file-to-load">
+                <button class="btn-icon" onclick="return false;" id="save-file" title="Save"><img
+                        src="images/save-file.png"></button>
+                <button class="btn-icon" onclick="return false;" id="revert" title="Cancel last (Ctrl+Z)"
+                        disabled="disabled"><img src="images/revert.png"></button>
+                <button class="btn-icon" onclick="return false;" id="clear" title="Clear all"><img
+                        src="images/cleaner.png"></button>
+                <button class="btn-icon" onclick="return false;" id="fill-by-color" title="Change color"><img
+                        src="images/fill-by-color.png"/></button>
+                <button class="btn-icon" onclick="return false;" id="pipet" title="Choose color"><img
+                        src="images/pipet.png"></button>
+                <button class="btn-icon" onclick="return false;" id="add-line" title="Add line">+</button>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-12">
+            <div class="input-block color-wrap">
+                <div class="colorpicker_color"></div>
+                <div id="color">
+                    <div class="fillStyle">
+                        <div class="input-radio">
+                            <input type="radio" name="bead-style" value="glossy"> Glossy
+                        </div>
+                        <div class="input-radio">
+                            <input type="radio" name="bead-style" value="mat" checked> Mat
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row error"></div>
+    <div class="row">
+        <div class="col-lg-6 col-sm-12">
+            <img id="progress-loader" src="images/loading.gif"/>
+            <div id="schema" class="canvas-container">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6 col-sm-12">
+            <div id="schema-line" class="canvas-container">
+                <canvas id="canvas-line"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
