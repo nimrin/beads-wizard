@@ -5,7 +5,8 @@ var CONST = {
     WHITE: "#ffffff",
     LIGHTER_INDEX: 0.8,
     LINE_SPACE: 25,
-    SCALE_WIDTH: 30
+    SCALE_WIDTH: 30,
+    colors: ['violet', 'siren', 'mint']
 };
 
 var wizard = {
@@ -27,8 +28,17 @@ var wizard = {
     totalBeadsNumber: 0,
     colorsCount: {}
 };
-
+function generateColorSelect() {
+    var select = '<select><option value="">select color name</option>';
+    for (var i = 0; i < CONST.colors.length; i++) {
+        select += '<option value="' + CONST.colors[i] + '">' + CONST.colors[i] + '</option>'
+    }
+    select += '</select>';
+    return select;
+}
 $(function () {
+    var isDragging = false, colorSelect = generateColorSelect();
+
     setCurrentColor(CONST.WHITE);
 
     wizard.jcanvas = $("#canvas");
@@ -38,8 +48,6 @@ $(function () {
     wizard.fillByColorBtn = $("#fill-by-color");
 
     init(false);
-
-    var isDragging = false;
 
     $("button").click(function () {
         setDefaultMode();
@@ -181,7 +189,7 @@ $(function () {
             ctrlDown = false;
         }
     };
-});
+
 function countColor(oldColor, newColor) {
     if (wizard.colorsCount[oldColor]) {
         wizard.colorsCount[oldColor]--;
@@ -199,7 +207,8 @@ function countColor(oldColor, newColor) {
     for (var color in wizard.colorsCount) {
         if (wizard.colorsCount.hasOwnProperty(color)) {
             str += '<tr class="color-container"><td><div class="color-sample" style="background-color: '
-                + color + '"></div></td><td class="color-count"> ' + wizard.colorsCount[color] + '</td></tr>'
+                + color + '"></div></td><td class="color-count"> ' + wizard.colorsCount[color] + '</td>' +
+                '<td>' + colorSelect + '</td></tr>'
         }
     }
     $('#color-samples').html(str);
@@ -408,6 +417,7 @@ function init(fromFile) {
         drawScale();
 
         if (!fromFile) {
+            wizard.colorsCount = {};
             initBeadsMatrix();
         }
         drawSchema(fromFile);
@@ -548,5 +558,6 @@ function nextIndex(lineIndex, beadIndex) {
 function isSameColor(bead, color, style) {
     return bead.color == color && bead.fillStyle == style;
 }
+});
 
 

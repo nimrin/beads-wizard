@@ -171,3 +171,7 @@ button:disabled {
     display: table;
     margin-top: 10px;
 }
+.color-container select {
+    margin-left: 4px;
+    line-height: 20px;
+}
