@@ -1,11 +1,11 @@
 var CONST = {
     BEAD_HEIGHT: 14,
     BEAD_WIDTH: 14,
-    modes: {drawing: "default", pipet: "pipet", filling:"filling"},
+    modes: {drawing: "default", pipet: "pipet", filling: "filling"},
     WHITE: "#ffffff",
     LIGHTER_INDEX: 0.8,
     LINE_SPACE: 25,
-    SCALE_WIDTH:30
+    SCALE_WIDTH: 30
 };
 
 var wizard = {
@@ -17,7 +17,7 @@ var wizard = {
     fillByColorBtn: null,
     color: null,
     mode: CONST.modes.drawing,
-    offsetX: CONST.BEAD_WIDTH/2,
+    offsetX: CONST.BEAD_WIDTH / 2,
     beads: {nextIndex: 0},
     linesY: [],
     linesMaxIndex: 0,
@@ -40,23 +40,23 @@ $(function () {
 
     var isDragging = false;
 
-    $("button").click(function() {
+    $("button").click(function () {
         setDefaultMode();
     });
 
-    $("#apply").click(function() {
+    $("#apply").click(function () {
         savePrevState();
         init(false);
     });
 
-    $("#clear").click(function() {
+    $("#clear").click(function () {
         savePrevState();
         $("#color").ColorPickerSetColor(CONST.WHITE);
         setCurrentColor(CONST.WHITE);
         init(false);
     });
 
-    $("#pipet").click(function() {
+    $("#pipet").click(function () {
         setPipetMode();
 
     }).hover(
@@ -71,7 +71,7 @@ $(function () {
     $("#color").ColorPicker({
         color: wizard.color,
         flat: true,
-        onSubmit: function(hsb, hex) {
+        onSubmit: function (hsb, hex) {
             setCurrentColor("#" + hex);
         },
         onBeforeShow: function () {
@@ -81,32 +81,32 @@ $(function () {
 
     $('.colorpicker_submit').html('<button>Select</button>');
 
-    $("#save-file").click(function() {
+    $("#save-file").click(function () {
         saveAsFile();
     });
 
-    $("#load-file").click(function() {
+    $("#load-file").click(function () {
         $("#file-to-load").click();
     });
 
-    $("#file-to-load").change(function() {
+    $("#file-to-load").change(function () {
         savePrevState();
         loadFile();
     });
 
-    $("#revert").click(function() {
+    $("#revert").click(function () {
         revert();
     });
 
-    $("#add-line").click(function() {
+    $("#add-line").click(function () {
         addLine(true);
     });
 
-    $("#remove-line").click(function() {
+    $("#remove-line").click(function () {
         removeLine();
     });
 
-    wizard.jcanvas.click(function(e) {
+    wizard.jcanvas.click(function (e) {
         var bead;
         if (wizard.mode == CONST.modes.drawing) {
             fillBeadAtEvent(e);
@@ -125,47 +125,48 @@ $(function () {
             if (bead != null) {
                 fillBeadsByColor(bead.color, bead.fillStyle);
             }
-    }}).mousedown(function () {
+        }
+    }).mousedown(function () {
         if (wizard.mode == CONST.modes.drawing) {
             savePrevState();
             isDragging = true;
             $(window).mousemove(function (e) {
                 if (isDragging) {
-                   fillBeadAtEvent(e);
+                    fillBeadAtEvent(e);
                 }
             });
         }
     }).mouseup(function () {
-            if (isDragging) {
-                isDragging = false;
-                $(window).unbind("mousemove");
-            }
-    });
-
-    $(window).mouseup(function() {
         if (isDragging) {
             isDragging = false;
             $(window).unbind("mousemove");
         }
     });
 
-    $("#fill-all").click(function() {
+    $(window).mouseup(function () {
+        if (isDragging) {
+            isDragging = false;
+            $(window).unbind("mousemove");
+        }
+    });
+
+    $("#fill-all").click(function () {
         savePrevState();
         fillAllBeads();
     });
 
-    wizard.fillByColorBtn.click(function() {
-       setFillingMode();
+    wizard.fillByColorBtn.click(function () {
+        setFillingMode();
     });
 
-    $("#schema").click(function() {
+    $("#schema").click(function () {
         setDefaultMode();
     });
 
     var ctrlDown = false;
     var ctrlKey = 17, zKey = 90;
 
-    window.onkeydown = function(e) {
+    window.onkeydown = function (e) {
         if (e.keyCode == ctrlKey) {
             ctrlDown = true;
         }
@@ -174,7 +175,7 @@ $(function () {
         }
     };
 
-    window.onkeyup = function(e) {
+    window.onkeyup = function (e) {
         if (e.keyCode == ctrlKey) {
             ctrlDown = false;
         }
@@ -205,7 +206,15 @@ function addLine(addition) {
     }
 }
 function removeLine() {
+    if (wizard.beads.nextIndex > 0) {
+        delete wizard.beads[wizard.beads.nextIndex - 1];
+    }
+    wizard.beads.nextIndex--;
 
+    wizard.linesNumber--;
+    $("#lines-number").val(wizard.linesNumber);
+
+    init(true);
 }
 function savePrevState() {
     $("#revert").removeAttr("disabled");
@@ -231,8 +240,8 @@ function fillAllBeads() {
 }
 function fillBeadsByColor(oldColor, oldStyle) {
     if (wizard.beads.nextIndex > 0) {
-        for (var i=0; i < wizard.beads.nextIndex; i++) {
-            for (var j=0; j < wizard.beads[i].length; j++) {
+        for (var i = 0; i < wizard.beads.nextIndex; i++) {
+            for (var j = 0; j < wizard.beads[i].length; j++) {
                 if ((oldColor == null || wizard.beads[i][j].color == oldColor) && (oldStyle == null || wizard.beads[i][j].fillStyle == oldStyle)) {
                     fillBead(wizard.beads[i][j], wizard.color);
                 }
@@ -258,15 +267,15 @@ function fillBeadAtEvent(e) {
 function colorLuminance(hex, lum) {
     hex = String(hex).replace(/[^0-9a-f]/gi, '');
     if (hex.length < 6) {
-        hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
     }
     lum = lum || 0;
 
     var rgb = "#", c, i;
     for (i = 0; i < 3; i++) {
-        c = parseInt(hex.substr(i*2,2), 16);
+        c = parseInt(hex.substr(i * 2, 2), 16);
         c = Math.round(Math.min(Math.max(0, c + c * lum), 255)).toString(16);
-        rgb += ("00"+c).substr(c.length);
+        rgb += ("00" + c).substr(c.length);
     }
     return rgb;
 }
@@ -385,7 +394,7 @@ function drawScale() {
     wizard.contextObj.fillStyle = "#000000";
 
     for (var i = 1; i <= wizard.linesNumber; i++) {
-        wizard.contextObj.fillText(i.toString(), 0.5, (i-1) * CONST.BEAD_HEIGHT);
+        wizard.contextObj.fillText(i.toString(), 0.5, (i - 1) * CONST.BEAD_HEIGHT);
     }
 }
 function getCanvasHeight() {
@@ -401,7 +410,7 @@ function initBeadsMatrix() {
 function drawSchema(withColor) {
     if (wizard.beads.nextIndex > 0) {
         for (var i = 0; i < wizard.beads.nextIndex; i++) {
-            for (var j = 0; j < wizard.beads[i].length; j ++ ) {
+            for (var j = 0; j < wizard.beads[i].length; j++) {
                 wizard.contextObj.rect(wizard.beads[i][j].x, wizard.beads[i][j].y, CONST.BEAD_WIDTH, CONST.BEAD_HEIGHT);
                 if (withColor) {
                     fillBead(wizard.beads[i][j], wizard.beads[i][j].color)
@@ -415,23 +424,20 @@ function drawSchema(withColor) {
     }
 }
 
-function saveAsFile()
-{
+function saveAsFile() {
     var textToWrite = JSON.stringify(wizard.beads);
-    var textFileAsBlob = new Blob([textToWrite], {type:'text/javascript'});
+    var textFileAsBlob = new Blob([textToWrite], {type: 'text/javascript'});
     var fileNameToSaveAs = "beadsMaster.bms";
 
     var downloadLink = document.createElement("a");
     downloadLink.download = fileNameToSaveAs;
     downloadLink.innerHTML = "Download File";
-    if (window.webkitURL != null)
-    {
+    if (window.webkitURL != null) {
         // Chrome allows the link to be clicked
         // without actually adding it to the DOM.
         downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
     }
-    else
-    {
+    else {
         // Firefox requires the link to be added to the DOM
         // before it can be clicked.
         downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
@@ -443,8 +449,7 @@ function saveAsFile()
     downloadLink.click();
 }
 
-function destroyClickedElement(event)
-{
+function destroyClickedElement(event) {
     document.body.removeChild(event.target);
 }
 
@@ -461,7 +466,7 @@ function loadFile() {
 
                 init(true);
             }
-        } catch(err) {
+        } catch (err) {
             alert("Неправильный формат файла.")
         }
     };
