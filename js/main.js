@@ -197,24 +197,21 @@ $(function () {
 
     function playSound() {
         wizard.soundIndex++;
-        if (wizard.soundIndex == wizard.sounds.length) return;
+        if (wizard.soundIndex == wizard.sounds.length) {
+            return;
+        }
 
-        wizard.sounds[wizard.soundIndex].addEventListener('ended', playSound);
-        wizard.sounds[wizard.soundIndex].play();
+        var audio = wizard.sounds[wizard.soundIndex].audio;
+
+        audio.addEventListener('ended', function() {
+            setTimeout(playSound, 1000 * wizard.sounds[wizard.soundIndex].delay);
+        });
+
+        audio.play();
     }
 
     function createAudio(fileName, id) {
-        console.log(fileName + ' ' + id);
-
-        var audio = $( '#' + id + '-sound');
-        if (audio.length == 0) {
-            audio = $("<audio></audio>").attr({
-                'src':'C://projects/BeadsWizard/sound/' + fileName + '.mp3',
-                'id': id + '-sound'
-            });
-            audio.appendTo("body");
-        }
-        return audio[0];
+        return new Audio('C://projects/BeadsWizard/sound/' + fileName + '.mp3');
     }
 
     function readSchema() {
@@ -228,10 +225,14 @@ $(function () {
             schemaItem = wizard.lineSchema[i];
             colorValue = $(schemaItem.color).val();
 
-            wizard.sounds.push(createAudio(colorValue, schemaItem.color.substr(1)));
-            wizard.sounds.push(createAudio(schemaItem.number, schemaItem.number));
+            if (colorValue.length > 0) {
+                wizard.sounds.push({audio: createAudio(colorValue, schemaItem.color.substr(1)), delay: 0});
+                wizard.sounds.push({
+                    audio: createAudio(schemaItem.number, schemaItem.number),
+                    delay: schemaItem.number
+                });
+            }
         }
-
         wizard.soundIndex = -1;
         playSound();
     }
@@ -270,6 +271,8 @@ $(function () {
         var beadsInLine = wizard.beadsNumber;
         if (wizard.beads.nextIndex % 2 != 0) {
             offset = wizard.offsetX;
+        } else {
+            beadsInLine++;
         }
         for (var j = 0; j < beadsInLine; j++) {
             wizard.beads[wizard.beads.nextIndex][j] = {
@@ -476,7 +479,7 @@ $(function () {
             wizard.linesMaxIndex = wizard.linesNumber - 1;
             wizard.beadsMaxIndex = wizard.beadsNumber - 1;
 
-            wizard.canvasObj.width = wizard.schemaStartX + wizard.beadsNumber * CONST.BEAD_WIDTH + CONST.BEAD_WIDTH;
+            wizard.canvasObj.width = wizard.schemaStartX + wizard.beadsNumber * CONST.BEAD_WIDTH + CONST.BEAD_WIDTH * 2;
             wizard.canvasObj.height = getCanvasHeight();
 
             drawScale();
