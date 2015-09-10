@@ -25,9 +25,9 @@ var wizard = {
     beadsMaxIndex: 0,
     schemaStartX: CONST.SCALE_WIDTH + 0.5,
     prevState: {nextIndex: 0},
-    totalBeadsNumber: 0,
     colorsCount: {},
-    sounds: {}
+    sounds: {},
+    pause: false
 };
 function generateColorSelect(id) {
     var select = '<select id="' + id + '"><option value="">select color name</option>';
@@ -38,7 +38,7 @@ function generateColorSelect(id) {
     return select;
 }
 $(function () {
-    var isDragging = false;
+    var isDragging = false, playBtn = $('#play');
 
     setCurrentColor(CONST.WHITE);
 
@@ -116,7 +116,7 @@ $(function () {
         removeLine();
     });
 
-    $("#read").click(function () {
+    playBtn.click(function () {
         readSchema();
     });
 
@@ -196,8 +196,13 @@ $(function () {
     };
 
     function playSound() {
+        if (wizard.sounds.length === 0 || wizard.pause) {
+            return;
+        }
         wizard.soundIndex++;
         if (wizard.soundIndex == wizard.sounds.length) {
+            wizard.playing = false;
+            playBtn.removeClass('selected').html('>');
             return;
         }
 
@@ -210,11 +215,27 @@ $(function () {
         audio.play();
     }
 
-    function createAudio(fileName, id) {
+    function createAudio(fileName) {
         return new Audio('C://projects/BeadsWizard/sound/' + fileName + '.mp3');
     }
 
     function readSchema() {
+        if (wizard.pause) {
+            console.log('resume');
+            wizard.pause = false;
+            playBtn.addClass('selected').html('||');
+            wizard.playing = true;
+        } else if (!wizard.playing) {
+            console.log('start');
+            playBtn.addClass('selected').html('||');
+            wizard.playing = true;
+            wizard.soundIndex = -1;
+        } else {
+            console.log('pause');
+            wizard.pause = true;
+            playBtn.removeClass('selected').html('>');
+            return;
+        }
         wizard.sounds = [];
 
         wizard.lineSchema = schemaToLine();
@@ -233,7 +254,7 @@ $(function () {
                 });
             }
         }
-        wizard.soundIndex = -1;
+
         playSound();
     }
 
@@ -454,7 +475,7 @@ $(function () {
                 }
 
                 var beadIndex = Math.floor((cursorX - offset) / CONST.BEAD_WIDTH);
-                if (beadIndex <= wizard.beadsNumber - 1) {
+                if (beadIndex <= wizard.beads[lineIndex].length - 1) {
                     return wizard.beads[lineIndex][beadIndex];
                 }
             }
@@ -472,8 +493,6 @@ $(function () {
 
         wizard.beadsNumber = $("#beads-number").val();
         wizard.linesNumber = $("#lines-number").val();
-
-        wizard.totalBeadsNumber = wizard.beadsNumber * wizard.linesNumber;
 
         if (/^\d+$/.test(wizard.beadsNumber.toString()) && /^\d+$/.test(wizard.linesNumber.toString())) {
             wizard.linesMaxIndex = wizard.linesNumber - 1;
@@ -609,8 +628,8 @@ $(function () {
 
     function nextIndex(lineIndex, beadIndex) {
         var maxBeadIndex = wizard.beadsMaxIndex;
-        if (lineIndex % 2 != 0) {
-            maxBeadIndex--;
+        if (lineIndex % 2 == 0) {
+            maxBeadIndex++;
         }
         if (lineIndex == wizard.linesMaxIndex && beadIndex == maxBeadIndex)
             return null;
